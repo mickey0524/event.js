@@ -11,7 +11,20 @@ class Event {
    * @param {Object} element DOM元素 
    */
   constructor(element) {
+    if (element.nodeType === 3 || element.nodeType === 8) {
+      this.isIgnore = true;
+    }
     this.ele = element;
+  }
+
+  /**
+   * 检查是否需要处理
+   */
+  checkIsIgnore() {
+    if (this.isIgnore) {
+      console.log('文本节点和注释节点不处理');
+    }
+    return this.isIgnore;
   }
 
   /**
@@ -20,6 +33,9 @@ class Event {
    * @param {Function} cb 回调函数
    */
   add(type, cb) {
+    if (this.checkIsIgnore()) {
+      return;
+    }
     if (this.ele.addEventListener) {
       this.ele.addEventListener(type, cb, false);
     } else if (this.ele.attachEvent) {
@@ -50,6 +66,9 @@ class Event {
    * @param {Function} cb 回调函数
    */
   remove(type, cb) {
+    if (this.checkIsIgnore()) {
+      return;
+    }
     if (this.ele.removeEventListener) {
       this.ele.removeEventListener(type, cb, false);
     } else if (this.ele.attachEvent) {
@@ -70,6 +89,9 @@ class Event {
    * @param {String} type 事件名 
    */
   trigger(type) {
+    if (this.checkIsIgnore()) {
+      return;
+    }
     if (this.ele.dispatchEvent) {
       let evt = document.createEvent('Event');
       evt.initEvent(type, true, true);

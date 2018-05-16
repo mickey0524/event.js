@@ -12,6 +12,14 @@ event2
   .add('custom:after5sec', () => { console.log('5s..'); })
   .add('custom:after5sec', () => { console.log('5s...'); });
 
+const textNode = document.createTextNode('文本节点');
+const event3 = new Event(textNode);
+event3.add('custom:after5sec', () => {
+  console.log('textNode');
+});
+
 setTimeout(() => {
   event2.trigger('custom:after5sec');
+  event3.trigger('custom:after5sec');
 }, 5000);
+
