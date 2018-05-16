@@ -30,13 +30,11 @@ class Event {
         const callback = (ev) => {
           ev = ev || window.event;
           if (ev.propertyName === type) {
-            cb.apply(this);
+            cb.apply(this.ele);
           }
         }
         this.ele.attachEvent('onpropertychange', callback);
-        if (!this.ele[`cb:${type}`]) {
-          this.ele[`cb:${type}`] = callback;
-        }
+        (!this.ele[`cb:${type}`] || new Map()).set(cb, callback);
       } else {
         this.ele.attachEvent(`on${type}`, cb);
       }
@@ -55,9 +53,9 @@ class Event {
     if (this.ele.removeEventListener) {
       this.ele.removeEventListener(type, cb, false);
     } else if (this.ele.attachEvent) {
-      if (type.startsWith('custom')) {
-        this.ele.detachEvent('onpropertychange', this.ele[`cb:${type}`]);
-        this.ele[`cb:${type}`] = null;
+      if (type.startsWith('custom') && this.ele[`cb:${type}`].has(cb)) {
+        this.ele.detachEvent('onpropertychange', this.ele[`cb:${type}`].get(cb));
+        this.ele[`cb:${type}`].delete(cb);
       } else {
         this.ele.detachEvent(`on${type}`, cb);
       }
